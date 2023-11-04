@@ -32,13 +32,10 @@ class Validator:
         entry_rule = list(grammar.rules.values())[0]
         self.pos = 0
         gen = self.validate_rule(entry_rule)
-        while True:
-            try:
-                next(gen)
-                if self.pos == len(self.input_str):
-                    return True
-            except StopIteration:
-                return False
+        for _ in gen:
+            if self.pos == len(self.input_str):
+                return True
+        return False
 
     def validate_rule(self, rule: Rule):
         old_pos = self.pos
@@ -70,12 +67,9 @@ class Validator:
             gen = self.get_gen(items[0])
             temp = gen(items[0])
 
-            while True:
-                try:
-                    next(temp)
-                except StopIteration:
-                    break
+            for _ in temp:
                 total += 1
+
             for i in range(1, total + 1):
                 self.pos = old_pos
                 temp = gen(items[0])
@@ -88,8 +82,7 @@ class Validator:
     def validate_name(self, name: Name):
         if name.name not in self.grammar.rules:
             raise Exception("Invalid grammar")
-        else:
-            yield from self.validate_rule(self.grammar.rules[name.name])
+        yield from self.validate_rule(self.grammar.rules[name.name])
 
     def validate_singleton(self, singleton: Singleton):
         if not self.input_str[self.pos :].startswith(singleton.codepoint):
