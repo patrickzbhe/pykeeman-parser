@@ -65,16 +65,16 @@ class Validator:
             old_pos = self.pos
             total = 0
             gen = self.get_gen(items[0])
-            temp = gen(items[0])
-
-            for _ in temp:
-                total += 1
-
-            for i in range(1, total + 1):
+            i = 0
+            while True:
+                i += 1
                 self.pos = old_pos
                 temp = gen(items[0])
-                for _ in range(i):
-                    next(temp)
+                try:
+                    for _ in range(i):
+                        next(temp)
+                except StopIteration:
+                    break
                 yield from validate_items_inner(items[1:])
 
         yield from validate_items_inner(items.items)
